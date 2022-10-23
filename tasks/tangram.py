@@ -65,6 +65,7 @@ class Block:
 
 class Tangram(Task):
     def __init__(self, *args, **kwargs):
+        """Tangram puzzle task."""
         super().__init__(*args, **kwargs)
         self.blocks_n = 7
         self.max_steps = 10
@@ -127,6 +128,7 @@ class Tangram(Task):
                 )
             )
 
+        # debug settings
         p.addUserDebugLine([0.25, 0, 0.05], [0.75, 0, 0.05], [0, 1, 0])
         p.addUserDebugLine([0.4, 0.15, 0.05], [0.4, 0.35, 0.05], [0, 0, 1])
         p.addUserDebugLine([0.4, 0.35, 0.05], [0.6, 0.35, 0.05], [0, 0, 1])
@@ -134,7 +136,7 @@ class Tangram(Task):
         p.addUserDebugLine([0.6, 0.15, 0.05], [0.4, 0.15, 0.05], [0, 0, 1])
 
     def add_object(self, env, block, pose, category="rigid"):
-        # create objects and add it into env
+        """create objects and add it into env."""
         shift = [0, 0, 0]
         obj = block.obj
         vhacd = block.vhacd

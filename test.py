@@ -23,7 +23,7 @@ def demos(
     assets_root="./assets", task="tangram", disp=True, mode="train", data_dir=".", n=100
 ):
     # Initialize environment and task.
-    env = Environment(assets_root, disp, hz=480)
+    env = Environment(assets_root, disp=disp, hz=480)
     task = tasks.names[task]()
     task.mode = mode
 
@@ -65,4 +65,4 @@ def demos(
 if __name__ == "__main__":
     # app.run(demos)
     registe_task("tangram", Tangram)
-    demos()
+    demos(disp=False)
