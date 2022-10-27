@@ -62,6 +62,10 @@ class Block:
         bs = properties[type][3]
         self.base_size = [x * scale for x in bs]
 
+    def set_id(self, id):
+        """Set block id."""
+        self.id = id
+
 
 class Tangram(Task):
     def __init__(self, *args, **kwargs):
@@ -83,6 +87,8 @@ class Tangram(Task):
             Block("square", BlockType.SQUARE, [0, 1, 1, 1], self.size_scale),
             Block("parallel", BlockType.PARALLEL, [1, 1, 1, 1], self.size_scale),
         ]
+        self.block_to_tangram = None
+        self.tangram_pose = [[0.5, 0.25, 0], p.getQuaternionFromEuler([0, 0, 0])]
 
     def reset(self, env):
         super().reset(env)
@@ -91,25 +97,18 @@ class Tangram(Task):
         for block in self.blocks:
             pose = self.get_random_pose(env, block.base_size)
             obj_id = self.add_object(env, block, pose)
+            block.set_id(obj_id)
             objs.append((obj_id, (np.pi / 2, None)))
             # utils.mark_point(pose[0])
             # text_to_block = ((0, 0, 0.05), p.getQuaternionFromEuler((0, 0, 0)))
             # p.addUserDebugText(block.name, ravens_utils.multiply(pose, text_to_block)[0])
-        block_to_tangram = [
-            [[0, -2 / 3 * sqrt_2, 0.02], [0, 0, -1 * math.pi / 4]],
-            [[2 / 3 * sqrt_2, 0, 0.02], [0, 0, math.pi / 4]],
-            [[-2 / 3 * sqrt_2, 2 / 3 * sqrt_2, 0.02], [0, 0, 0]],
-            [[-sqrt_2 / 3, 0, 0.02], [0, 0, -3 * math.pi / 4]],
-            [[sqrt_2 / 2, 5 / 6 * sqrt_2, 0.02], [0, 0, 3 * math.pi / 4]],
-            [[0, sqrt_2 / 2, 0.02], [0, 0, math.pi / 4]],
-            [[-3 / 4 * sqrt_2, -1 / 4 * sqrt_2, 0.02], [0, math.pi, 3 * math.pi / 4]],
-        ]
-        tangram_to_world = [[0.5, 0.25, 0], p.getQuaternionFromEuler([0, 0, 0])]
+        if not self.block_to_tangram:
+            raise "Please set tangram goals first."
         block_to_world = []
-        for p_t, o_t in block_to_tangram:
+        for p_t, o_t in self.block_to_tangram:
             p_ = [x * self.posi_scale for x in p_t]
             o_ = p.getQuaternionFromEuler(o_t)
-            pose = ravens_utils.multiply(tangram_to_world, (p_, o_))
+            pose = ravens_utils.multiply(self.tangram_pose, (p_, o_))
             block_to_world.append(pose)
             utils.mark_point(pose[0])
         # goals structure:
@@ -134,6 +133,16 @@ class Tangram(Task):
         p.addUserDebugLine([0.4, 0.35, 0.05], [0.6, 0.35, 0.05], [0, 0, 1])
         p.addUserDebugLine([0.6, 0.35, 0.05], [0.6, 0.15, 0.05], [0, 0, 1])
         p.addUserDebugLine([0.6, 0.15, 0.05], [0.4, 0.15, 0.05], [0, 0, 1])
+
+    def reward(self):
+        return super().reward()
+
+    def set_goals(self, goals):
+        """Set goals for tangram.
+        
+        goals: list[list[list(position), list(orientation)]]
+        """
+        self.block_to_tangram = goals
 
     def add_object(self, env, block, pose, category="rigid"):
         """create objects and add it into env."""

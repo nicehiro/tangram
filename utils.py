@@ -1,8 +1,21 @@
+import math
 import time
 
 import pybullet as p
 import pybullet_data
 from ravens import tasks
+
+sqrt_2 = math.sqrt(2)
+
+goals = [
+    [[0, -2 / 3 * sqrt_2, 0.02], [0, 0, -1 * math.pi / 4]],
+    [[2 / 3 * sqrt_2, 0, 0.02], [0, 0, math.pi / 4]],
+    [[-2 / 3 * sqrt_2, 2 / 3 * sqrt_2, 0.02], [0, 0, 0]],
+    [[-sqrt_2 / 3, 0, 0.02], [0, 0, -3 * math.pi / 4]],
+    [[sqrt_2 / 2, 5 / 6 * sqrt_2, 0.02], [0, 0, 3 * math.pi / 4]],
+    [[0, sqrt_2 / 2, 0.02], [0, 0, math.pi / 4]],
+    [[-3 / 4 * sqrt_2, -1 / 4 * sqrt_2, 0.02], [0, math.pi, 3 * math.pi / 4]],
+]
 
 
 def testit(func):

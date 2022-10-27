@@ -4,3 +4,4 @@
 *.txt
 assets/
 *.pkl
+log/

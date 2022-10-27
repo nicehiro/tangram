@@ -1,8 +1,11 @@
-from stable_baselines3 import PPO
-from ravens.environments.environment import Environment
-from environment.env_wrapper import WrappedEnv
+import math
+
 from ravens import tasks as ravens_tasks
+from stable_baselines3 import PPO
+from models.feature_extractor import CustomCombinedExtractor
+
 import tasks
+from environment.env_wrapper import WrappedTangramEnv
 
 
 def train(
@@ -13,15 +16,24 @@ def train(
     data_dir=".",
     n=100,
 ):
-    env = WrappedEnv(assets_root, disp)
     task = ravens_tasks.names[task]()
     task.mode = mode
+    env = WrappedTangramEnv(assets_root, task, disp)
 
-    model = PPO("MlpPolicy", env, n_steps=20, verbose=1, tensorboard_log="./log/")
-    env.set_task(task)
+    policy_kwargs = dict(
+        features_extractor_class=CustomCombinedExtractor,
+        features_extractor_kwargs=dict(),
+    )
+    model = PPO(
+        "MultiInputPolicy",
+        env,
+        n_steps=20,
+        verbose=1,
+        tensorboard_log="./log/",
+        policy_kwargs=policy_kwargs,
+    )
 
     model.learn(total_timesteps=10_000)
-
 
     for i in range(n):
         action, _ = model.predict(obs, deterministic=True)
@@ -33,5 +45,5 @@ def train(
     env.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     train(disp=False)

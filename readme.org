@@ -1,0 +1,6 @@
+* Tangram Solver
+
+** TODOList
+*** TODO add goal image in observation space
+*** DONE extract features in observation to use sb3
+*** TODO design a good reward function
